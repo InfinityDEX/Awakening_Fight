@@ -1,0 +1,34 @@
+struct PS_INPUT
+{
+	float4 Pos : SV_POSITION;
+	float4 Color : COLOR;
+	float2 Tex : TEXCOORD;
+};
+
+cbuffer ConstBuffer : register(b0)
+{
+	matrix matWorld;
+	matrix matView;
+	matrix matProj;
+	float4 Time;
+	float4 Color;
+	float4 Value;
+};
+
+Texture2D tex : register(t0);
+Texture2D tex2 : register(t1);
+Texture2D tex3 : register(t2);
+SamplerState samLinear : register(s0);
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+	float2 uv;
+
+	uv = input.Tex;
+	float4 diff = tex.Sample(samLinear, uv);
+	if (tex2.Sample(samLinear, input.Tex).x < Value.x)
+		if (tex3.Sample(samLinear, input.Tex).w > 0)
+			return tex3.Sample(samLinear, uv) * Color;
+		
+	return diff * Color;
+}
